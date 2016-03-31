@@ -26,16 +26,26 @@ def annotate(hoge):
 
 
 # アノテーションの結果をjson形式にして出力
-output_text = []
-output_dict = {}
 def stringize(hoge):
+    output_file_json = "result/" + sys.argv[1] + ".json"
+    output_file_txt = "result/" + sys.argv[1] + ".txt"
+
+    output = open(output_file_txt, "w")
+    text = t1.get(t1.index("1.0"), t1.index(tk.END))
+    output.write(text.encode("utf-8"))
+    output.close()
+    
+    output = open(output_file_json, "w")
+    output_text = []
+    output_dict = {}
+
     i = 0
     index = t1.index(tk.END).split(".")
     while i < int(index[0]):
         start = str(i+1) + ".0"
         end = str(i+1) + ".end"
         if t1.get(start,end) != "":
-            output_text.append(t1.get(start,end))
+            output_text.append(t1.get(start,end).encode("utf-8"))
         i += 1
     for element in output_text:
         value_dict = {}
@@ -48,6 +58,7 @@ def stringize(hoge):
         output_dict[elem_list[0]] = value_dict
     output_json = json.dumps(output_dict, indent=4)
     output.write(output_json)
+    output.close()
 
 
 # t2にアノテーションしたテキストを挿入する
@@ -63,26 +74,24 @@ def get_value(hoge):
         
     ID_dict = Tag.get_id()
     entry_dict = Tag.get_entry()
-    print entry_dict
     if len(ID_dict.keys()) > 0:
         for k,v in ID_dict.items():
             if v.get() != "null":
                 t2.insert(tk.END, "," + k + ":" + v.get())
     if len(entry_dict.keys()) > 0:
         for k,v in entry_dict.items():
-            t2.insert(tk.END, "," + k + ":" + v.get())
+            if v.get() != "":
+                t2.insert(tk.END, "," + k + ":" + v.get())
                 
 
 if __name__ == "__main__":
-    input_filename = "resource/" + sys.argv[1] + ".txt"
-    output_filename = "result/" + sys.argv[1] + ".json"
+    input_filename = "resource/AnnotateTarget/" + sys.argv[1] + ".txt"
     text = open(input_filename, "r")
-    output = open(output_filename, "w")
 
     root = tk.Tk()
     # 実行処理はここから
     
-    root.title("Software Title")
+    root.title(sys.argv[1])
     root.geometry("1200x800")
     tagID = tk.IntVar()
     tagID.set(-1)
